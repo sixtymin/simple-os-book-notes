@@ -46,6 +46,7 @@
     * http://www.httpy.com/html/wangluobiancheng/Perljiaocheng/2014/0613/93894.html
     * http://wenku.baidu.com/view/4b004dd5360cba1aa811da77.html
     * http://blog.csdn.net/wooin/article/details/1858917
+    * http://blog.csdn.net/goowie/article/details/16806879
 * meld
     * https://linuxtoy.org/archives/meld-2.html
 * qemu
