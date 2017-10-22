@@ -1,0 +1,6 @@
+# For vim, gedit etc.
+*~
+
+#For C Program
+*.o
+
