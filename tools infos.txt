@@ -1,5 +1,7 @@
 
-understand 
+understand  4.0 
+
+https://scitools.com/download/all-builds/  官方下载地址
 
 1. 证书CODE(32/64 都可用)
     09E58CD1FB79
