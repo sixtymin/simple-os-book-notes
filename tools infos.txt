@@ -1,7 +1,27 @@
 
-understand  4.0 
+////////////////////////////////////////////////////////////////////////////
+1. understand  4.0 
 
 https://scitools.com/download/all-builds/  官方下载地址
+
+方式一（推荐）：直接“右击”---> "提取到此处"，生成scitools文件。
+
+方式二：$           gzip -cd Understand-3.1.670-Linux-64bit.tgz | tar xvf -
+
+三、破解
+
+1、添加路径
+$     gedit ~/.bashrc
+
+    打开启动文件，添加如下两条命令：
+export PATH=$PATH:/home/application/scitools/bin/linux64
+STIHOME=/home/application/scitools
+
+2、运行、破解
+    命令行定位到安装目录：
+$   cd  /home/application/scitools/bin/linux64
+$    ./understand
+
 
 1. 证书CODE(32/64 都可用)
     09E58CD1FB79
@@ -14,3 +34,7 @@ ps：我这个版本是3.1，我决定好好看产品手册
     F1AF6D901A38
     19878CBBFB13
     B0F234CE4366
+
+
+////////////////////////////////////////////////////////////////////////////
+2. 
