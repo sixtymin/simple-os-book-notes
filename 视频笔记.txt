@@ -17,7 +17,7 @@
 BIOS自检也是挺大一块内容，有时间可以研究一下！
 
 5. 最传统方式启动过程
-BIOS ->? MBR? ->? DBR? ->? Bootloader? ->? OS-Kernel
+BIOS -> MBR? -> DBR? -> Bootloader? -> OS-Kernel
 
 6. 中断，异常和系统调用
 区别与联系
