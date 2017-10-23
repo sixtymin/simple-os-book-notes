@@ -1,0 +1,60 @@
+
+make ~/.vim directory, then put files or dir in  vimconfig to .vim directory.
+
+other configs must put in ~/.vimrc file.
+
+0. Chinese help
+
+if vim can't show chinese,then add this setting.
+	set helplang=cn
+
+if doc files are encoded in utf-8,than set encoding to utf-i
+	set encoding=utf-8
+
+coding commands help:
+	:help usr_29
+	:help usr_30
+
+1.语法高亮
+syntax enable
+syntax on
+
+colorscheme desert
+
+2. ctags
+
+$ cd /home/wooin/vim71	# src to edit
+$ ctags -R	# create tags files
+
+set tags in vim:
+
+:set tags=/home/wooin/vim71/tags
+
+3. Tlist
+
+put  TagList.vim to plugin, 
+
+
+~/.vimrc add setttings
+
+	let Tlist_Show_One_File=1
+	let Tlist_Exit_OnlyWindow=1
+
+in vim input ":Tlist" to show list.
+
+
+4. Winexplorer and TagList
+
+let g:winManagerWindowLayout='FileExplorer|TagList'
+nmap wm :WMToggle<cr>
+
+:wm show TagList and FileExplore
+
+4. cscope
+
+add follow infos to ~/.vim 
+:set cscopequickfix=s-,c-,d-,i-,t-,e-
+
+5. smart input
+
+
