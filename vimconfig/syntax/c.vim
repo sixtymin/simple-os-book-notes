@@ -36,4 +36,4 @@ hi cLogicalOperatorError    guifg=#3EFFE2
 "========================================================
 " My Own DataType
 "========================================================
-syn keyword cType       My_Type_1 My_Type_2 My_Type_3
+"syn keyword cType       My_Type_1 My_Type_2 My_Type_3

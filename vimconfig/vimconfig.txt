@@ -1,27 +1,43 @@
 
-make ~/.vim directory, then put files or dir in  vimconfig to .vim directory.
+1. 创建 ~/.vim目录，然后将vimconfig目录下的doc，plugin，syntax目录拷贝过去。
+2. 然后拷贝1.vimrc文件到个人主目录下，改名为.vimrc，作为Vim的配置文件。
 
-other configs must put in ~/.vimrc file.
 
 0. Chinese help
 
-if vim can't show chinese,then add this setting.
+如果开启vim的中文帮助，如果vim不支持中文帮助，可以添加如下设置。
 	set helplang=cn
 
-if doc files are encoded in utf-8,than set encoding to utf-i
+如果Doc文件为utf-8编码，则编码设置为UTF-8编码
 	set encoding=utf-8
 
-coding commands help:
+1. 编程常用命令
+	%   跳到配对括号
+	[[  跳到代码块开头
+	gD  跳到局部变量定义处
+	''  跳到光标上次停靠地方
+	mx  设置书签，x只能是a-z的26个字母
+	`x  跳转到书签 x
+	x>  增加以下x行缩进
+	x<  减少以下x行缩进
+
+	VIM中编写代码可以参考如下两个帮助页：
 	:help usr_29
 	:help usr_30
 
-1.语法高亮
+2.语法高亮
 syntax enable
 syntax on
 
-colorscheme desert
+colorscheme desert  ; 设置颜色主题为 desert
 
-2. ctags
+set nu  			; 设置行号
+set autoindent 		; 自动缩进
+set tabstop=4		; 设置缩进长度，4个空格
+
+
+3. ctags
+	首先要安装 ctags程序。
 
 $ cd /home/wooin/vim71	# src to edit
 $ ctags -R	# create tags files
@@ -30,7 +46,7 @@ set tags in vim:
 
 :set tags=/home/wooin/vim71/tags
 
-3. Tlist
+4. Tlist
 
 put  TagList.vim to plugin, 
 
@@ -50,11 +66,11 @@ nmap wm :WMToggle<cr>
 
 :wm show TagList and FileExplore
 
-4. cscope
+5. cscope
 
 add follow infos to ~/.vim 
 :set cscopequickfix=s-,c-,d-,i-,t-,e-
 
-5. smart input
+6. smart input
 
 

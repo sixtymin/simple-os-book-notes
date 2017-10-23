@@ -1,3 +1,6 @@
+Vim Config
+
+http://www.cnblogs.com/ifys/archive/2010/10/24/1860610.html  
 http://blog.csdn.net/wooin/article/details/1858917
 
 
