@@ -17,8 +17,8 @@ syn match       cLogicalOperator  display "[!<>]=/="
 syn match       cLogicalOperator  display "=="
 " C bit operators
 syn match       cBinaryOperator   display "/(&/||/|/^/|<</|>>/)=/="
-syn match       cBinaryOperator   display "/~"
-syn match       cBinaryOperatorError display "/~="
+"syn match       cBinaryOperator   display "/~"
+"syn match       cBinaryOperatorError display "/~="
 " More C logical operators - highlight in preference to binary
 syn match       cLogicalOperator  display "&&/|||"
 syn match       cLogicalOperatorError display "/(&&/|||/)="

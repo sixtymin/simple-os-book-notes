@@ -2,6 +2,8 @@
 1. 创建 ~/.vim目录，然后将vimconfig目录下的doc，plugin，syntax目录拷贝过去。
 2. 然后拷贝1.vimrc文件到个人主目录下，改名为.vimrc，作为Vim的配置文件。
 
+安装ctags / cscope,如果源码编译成功可以用源码安装,如果编译失败可以用apt-get 安装
+
 
 0. Chinese help
 
