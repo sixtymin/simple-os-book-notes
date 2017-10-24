@@ -1,8 +1,0 @@
-https://github.com/spf13/spf13-vim
-
-
-
-http://www.jianshu.com/p/a0b452f8f720
-
-
-https://github.com/yangyangwithgnu/use_vim_as_ide
