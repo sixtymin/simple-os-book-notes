@@ -7,7 +7,7 @@
 这个特定地址是什么呢？对于不同的CPU这个地址值不同，80286以前（不是特别准确，想了解准确内容参考Intel的文档）的CPU中为0xFFFF0，而之后的CPU这个值为0xFFFFFFF0。即加电后CS/EIP值被重置为0xF000和0xFFF0，32位CPU中CS的Base值为0xFFFF0000，根据CPU加电后的地址计算方法，80386之后的CPU第一条访问地址为Base+EIP=0xFFFFFFF0。使用Bochs调试一下，如下图结果。
 
 <div align="center">
-![图1 Intel80386加电后第一条指令](D:\OS\ucoreOS\simple-os-book-notes\2017-10-22-tsinghua-os-course-ucore-bootloader-pc-init-instruction.jpg)
+![图1 Intel80386加电后第一条指令](D:\OS\ucoreOS\simple-os-book-notes\2017-10-22-tsinghua-os-course-ucore-bios-boot-pc-init-instruction.jpg)
 </div>
 
 从调试的内容可以看到，起始执行地址为CS:IP=0xF000:FFF0，但是其物理地址显示的为0x0000FFFFFFF0，同时在0xFFFF0物理地址处也有相同的内容。根据陈渝老师的解释，在32位CPU上BIOS被映射到4G空间最高64K的地址空间内，但是在1M向下的64K被CPU映射了和4G最高64K相同内容，但是这块64K其实是RAM而非4G空间最高64K的EPROM（这个内容待考证）。
@@ -15,13 +15,13 @@
 用Bochs模拟硬件来调试看一下4G和1M中第二条要执行指令对应位置的内容，如下图所示。它们的内容完全一致，也印证了上面的说法，但是至于真机中低1M处的64K是RAM还是ROM就无从验证了。
 
 <div align="center">
-![图2 4G和1M内存空间处BIOS内容对比](D:\OS\ucoreOS\simple-os-book-notes\2017-10-22-tsinghua-os-course-ucore-bootloader-4G-1M-BIOS-Compare.jpg)
+![图2 4G和1M内存空间处BIOS内容对比](D:\OS\ucoreOS\simple-os-book-notes\2017-10-22-tsinghua-os-course-ucore-bios-boot-4G-1M-BIOS-Compare.jpg)
 </div>
 
 在CPU加电后准备执行第一条指令时，这时候系统的物理内存映射情况如下图3所示。从图上可以看到在1M内存以下比较“热闹”，最低的640K是空闲内存，然后是VGA显存，再然后是设备的BIOS，再是系统BIOS，再之后就是可用的物理内存直到物理内存大小。
 
 <div align="center">
-![图3 Intel80386加电后物理地址空间分布](D:\OS\ucoreOS\simple-os-book-notes\2017-10-22-tsinghua-os-course-ucore-bootloader-intel80386-poweron-address-space.jpg)
+![图3 Intel80386加电后物理地址空间分布](D:\OS\ucoreOS\simple-os-book-notes\2017-10-22-tsinghua-os-course-ucore-bios-boot-intel80386-poweron-address-space.jpg)
 </div>
 
 其实看到这个内存图内心还是有很多疑问：前面根据陈渝老师的说法，这里的BIOS其实是RAM，那VGA部分占用的内存呢？其他的设备BIOS的内存段呢？
@@ -42,20 +42,18 @@
 
 根据上一节加电后指令执行并不是按照实模式的地址计算方法，当然它也不可能按照保护模式的地址计算，所以这第一条指令即非保护模式，也非实模式。从上面可以看到CPU加电后的第一条指令是`jmpf 0xF000:0xE05B`，这条指令不单纯是跳转，它会更新CS内容，如上一节的图所示，更新后CS的Base段被修改为0x000F0000，该条指令执行后，就跳入1M内存空间执行，并且开始进入CPU实模式，用实模式的CS左移4位加上IP的形式进行地址计算。
 
-跳入的代码段即BIOS。BIOS是被固化在计算机ROM（只读存储器）芯片上的特殊的软件，为上层软件提供了最底层的、最直接的硬件控制与支持。接下来要执行的BIOS代码主要完成了系统自检和MBR加载，详细说就是检测必要硬件是否可用，对于存在BIOS的设备（如显示器）则调用这些设备的BIOS进行设备初始化；硬件初始化完毕后，则加载引导设备中的MBR。
+跳入执行的代码段即BIOS，BIOS是被固化在计算机ROM（只读存储器）芯片上的特殊的软件，为上层软件提供了最底层的、最直接的硬件控制与支持。BIOS需要提供基本输入输出的程序，系统设置信息，开机后自检程序，系统自启动程序等。这里执行的BIOS代码主要完成了系统自检和MBR加载，详细说就是检测必要硬件是否可用，对于存在BIOS的设备（如显示器）则调用这些设备的BIOS进行设备初始化；硬件初始化完毕后，则加载引导设备中的MBR。
 
-这块的引导设备就比较丰富了，如软盘，CDROM，硬盘，USB设备等。
+这块的引导设备就比较丰富了，如软盘，CDROM，硬盘，USB设备等。那要加载那一个引导设备的MBR呢？这是由BIOS中保存的设置信息决定的，这个设置信息即在BIOS中设置的第一启动设备，第二启动设备等。比如在真实的物理机器上重新安装操作系统时要将BIOS启动顺序修改一下，即将CDROM设置为第一引导设备，这样CPU加电自检后，即选择从CDROM上引导就可以进入系统安装过程中了。当然了在安装完系统后，要将启动顺序修改回来，否则不弹出CDROM装的系统盘，那重启后再次进入CDROM准备系统安装。
 
-视频第三节 BIOS开始
+这里假设是从硬盘启动，那就是将硬盘的第一个扇区（即所谓的MBR）加载到物理内存的0x7C00处，然后从BIOS程序中跳转到0x7C00继续执行。
 
+> 注意这里的MBR的加载是由BIOS中固化的程序完成，然后在从BIOS程序跳转到0x7c00继续执行
 
-// 英文资料，普及
-http://duartes.org/gustavo/blog/archives/
+前面说到BIOS中需要提供基本的I/O，设置信息，自检程序以及系统自启动程序等，所以BIOS中的程序还是有很多内容，并且其中的基本I/O涉及到与外围硬件通信，这个能内容还比较复杂。而目前这里主要是编写一个操作系统，那么只调用BIOS提供功能，至于BIOS中的程序则是关注重点，不再详细分析。如果今后有精力，可以将BIOS中内容做个详细学习，当然还有UEI等。
 
-// 阮一峰 系统引导过程
-http://www.ruanyifeng.com/blog/2013/02/booting.html
+** 修改历史 **
 
+* 2017-10-23 10:55:23 完成博客
 
-#### 问题 ####
-
-1. 参考文献1 第九章第一节讲述了为啥加电后从0xFFFFFFF0地址开始执行
+By Andy @2017-10-23 10:55:23
