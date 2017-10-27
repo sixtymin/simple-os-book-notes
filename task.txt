@@ -1,3 +1,12 @@
+
+
+AT&T汇编
+
+http://www.imsiren.com/archives/909
+
+
+
+
 实践操作：
 1. 实验说明书 / simple_os
 
@@ -7,7 +16,13 @@
 
 
 
+
+
+
+
 // 英文资料，普及
+
+
 http://duartes.org/gustavo/blog/archives/
 
 
