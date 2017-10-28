@@ -1,0 +1,151 @@
+
+```
+.data
+output: .ascii "hello world\n"
+
+.text
+.global _start
+
+_start:
+    movl $4, %eax
+    movl $1, %ebx
+    movl $output, %ecx
+    movl $12, %edx
+    int $0x80
+    
+    movl $1, %eax
+    int $0x80 
+```
+
+程序打印 Hello World，
+
+AT&T语法中，一个节由.section关键字来标识，写汇编至少会遇到如下三种：
+.data  数据节，包含了程序已初始化的数据，即具有初始值的变量，如
+    hello: .string "Hello world!\n"
+    hello_len: .long 16
+
+.bss   未初始化数据节，这个节包含程序未初始化的数据，即包含没有初始值的变量。
+    name: .fill 30
+    name_len: .long 0  # 名字长度
+    
+    .bss段与.data相比在于.bss段编译后并不会占用磁盘空间，生成代码尺寸小。
+.bss和.data段编译时都是4字节对齐，即对于上述name变量预留空间为32字节
+
+.text   代码段，包含了程序代码，这个节会被编译为只读的节。
+
+汇编程序指令，即伪指令，如上述的.text 
+
+.ascii  表示0个或多个字符串，每个字符串中字符存放在连续内存，需要手动添加结尾符'\0'
+.asciz  与.ascii类似，但是会自动在字符串结尾地方添加一个'\0'字符
+.fill   .fill repeat, size, value 其中repeat, size, value 为常量表达式，反复拷贝
+size个字节，重复次数由repeat确定，值为value
+    .fill 30, 8, 0 表示反复30次向8个字节中拷贝0，即保留240字节空间
+.global  使得链接程序ld可以看到符号，即变量或符号可以在其他文件中引用
+
+.rept .endr:
+    .rept count 
+    ....
+    .endr    // 将.rept指令和.endr指令之间的行重复count次
+    
+    .rept 3
+    .long 0 
+    .endr   // 保留3个long变量，相当于数组
+    
+.space
+    .space size, fill 保留size个字节空间，每个字节值为fill，size和fill都是常量
+    Label: .space 10, 1 
+    
+.byte 
+    .byte expressions  预留1个字节，并将这个字节内容赋值expression，都好隔开则是预留多个
+    每个byte对应后面的expressions
+    
+.word 
+    .word expressions  预留两个字节，将两个字节赋值为expression
+    num: .word 0x100  定义WORD类型变量num，值为0x100
+    
+.long 类似.word 
+.set 设定常数，与C语言中 #define类似
+    .set mark, 0x10  定义常量mark，值为0x10
+
+
+$as --gstabs -o hello.o hello.s
+$ld -o hello hello.o
+
+
+如果汇编想要进行调试那就要在目标文件中带有符号表，as命令执行是带上--gstabs表示带上符号表
+但是在ld命令链接时不能带上-s参数，否则符号表在链接时会被删去
+
+/////////////////////////////////////////////////////////////////////////////
+GCC内联汇编的形式如下：
+
+asm [volatile] (
+    "asm statements 1\n\t"
+    "asm statements 2\n\t"
+    : output operands            // "=r"(val1)
+    : input operands             // ""(val2)
+    : list of clobberd registers // "%ecx" "memory"
+);
+
+__asm__ [__volatile__] (
+    "asm statements"
+    : output operands            // "=r"(val1)
+    : input operands             // ""(val2)
+    : list of clobberd registers // "%ecx" "memory"
+);
+
+上述为内联汇编的基本形式：
+
+对于连续的多条汇编语句，要用“\n\t”进行行之间的分隔。这主要是gcc调用as时时逐条处理
+要用换行来分隔多条语句。
+
+基本的内联汇编只需要asm("asm statemets")即可，而要扩展则需要输入寄存器，输出寄存器，
+修改寄存器列表。
+
+完整示例：
+
+int a = 10, b;
+asm("movl %1, %%eax\n\t"
+    "movl %%eax, %0"
+    :"=r"(b)    // output
+    :"r"(a)     // input 
+    :"%eax"     // clobberd register
+);
+
+变量b 是输出参数，使用寄存器%0引用，a是输入参数，使用%1引用。"r"是操作数约束，意思是
+GCC可以使用任何寄存器存储这个操作数。对于输出参数的约束修饰符要带"="。eax前的%%符号
+表示使用寄存器eax，之所以使用两个%是因为单个的%加数字被用作操作数了。修改寄存器%eax
+在第三行的冒号后告诉GCC寄存器%eax会在汇编中被修改，GCC不会使用这个寄存器用于存储数据。
+
+操作数对应于C表达式的先后顺序被%0，%1，%2 ...等表示。即先从输出操作数算起，计算完输出
+操作数，然后计算输入操作数，即b对应%0，a对应于%1。如果在"=r"(b)后有一个"=r"(c)，那么
+b对应%0， c对应%1，a则对应%2。
+
+修改列表：
+
+一些指令会修改硬件寄存器，则必须在修改列表中列出这些寄存器。即在第三个冒号之后，这就是
+告诉gcc在内嵌汇编中会修改这些寄存器，所以gcc不会认为记载进这些寄存器的值始终有效。对于
+输入和输出列表中的寄存器不需要放到修改列表中，gcc知道他们会被asm修改。如果指令会改变条件
+寄存器，则必须在变化寄存器列表中加入“cc”。如果指令会以不可预测方式修改内存，则需要在修改
+列表中添加“memory”关键字。
+
+volatile关键字表示内联的汇编代码不要被优化，按照原样编译，链接。
+
+约束还有如下几种：
+
+"r" 寄存器操作数约束，任意寄存器
+"q" 寄存器 eax，ebx，ecx或edx其中之一
+"I" 常数，0-31之间
+"J" 常数，0-63之间
+"K" 0xFF
+"L" 0xFFFF
+"M" 
+"N"
+"f" 浮点数寄存器
+"t" 第一个浮点指针寄存器
+"u" 第二个浮点指针寄存器
+"A" 指定‘a’或‘d’寄存器，主要用于64位整数。
+
+
+
+
+
