@@ -8,6 +8,11 @@ mbr: mbr.o
 run: mbr
 	qemu-system-i386 -boot a -fda mbr
 
+debug: mbr
+	qemu-system-i386 -boot a -fda mbr -S -s
+	sleep 2
+	gdb -gui -x dbginit
+
 clean:
 	rm mbr.o mbr
 
