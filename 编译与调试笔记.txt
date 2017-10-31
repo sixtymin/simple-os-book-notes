@@ -1,0 +1,61 @@
+
+1. 将C语言文件编译为汇编文件
+
+    gcc -S -m32 -Wall lab01.c  // 将lab01.c编译为对应的汇编代码
+    
+    -S 参数指示只汇编，不编译与连接
+        gcc -S main.c > main.s 
+        
+    -Wall 显示所有的警告信息
+    -m32  编译为32位代码（-m64 则表示生成64位代码，这个在64位系统上编译时有用）
+
+2. 要调试编译出来的文件，则需要添加如下的标记
+    
+    -o out.exe      指定编译输出文件名为out.exe，默认为a.out
+    -g 或 -ggdb     表示保留符号信息用于调试
+    
+    -static         表示进行静态链接，不再依赖动态库
+    -O3             进行最快速度优化
+    -DNDEBUG        定义NDEBUG 宏，屏蔽断言
+    
+    -E              只输出预编译结果
+        gcc -E main.S > main.s 
+    
+    -C              生成编译后代码，但是不进行连接
+    
+    -l              链接共享库（动态链接库）指定预编译选项 -l
+        gcc -Wall main.c -o main -lCPPfile  // 链接动态库 CPPfile.so
+        
+    -fPIC           生成独立位置信息代码
+        gcc -c -Wall -Werror -fPIC Cfile.c  // 编译为 独立位置信息 代码
+    
+    
+3. 
+
+    objdump -S lab05.exe     // dump elf文件中的代码
+    
+    readelf -a lab05.exe        // 读取elf中各个段
+    
+    nm lab05.exe                // 读取映射信息？？？
+    
+    file lab05.exe              // 显示文件信息
+    
+    strace -f ./lab10           // 追踪程序执行过程中的文件访问，列举出来
+    
+4. 汇编器 gas 与 链接器 ld 
+    
+    as -o mbr.o mbr.S
+        -o      指定生成的目标名字
+        
+    ld --oformat binary -N -e start -Ttext 0x7c00 -o mbr mbr.o
+        --oformat binary    指定链接后，生成目标的类型
+        -N
+        -e start            指定入口为start 
+        -Ttext              指定编译后代码运行基址 
+5. 调试 
+
+    gdb -gui -x gdbinit     // 以gdbinit文件 内容 为gdb命令行输入开始调试
+    
+        -gui            启动界面形式调试
+        -x gdbinit      以gdbinit文件作为命令输入
+        
