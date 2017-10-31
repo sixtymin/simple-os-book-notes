@@ -14,5 +14,14 @@ debug: mbr
 	gdb -gui -x dbginit
 
 clean:
-	rm mbr.o mbr
+	rm mbr.o mbr mbr-cga mbr-cga.o
 
+
+mbr-cga.o: mbr-cga.S
+	as -o mbr-cga.o mbr-cga.S
+
+mbr-cga: mbr-cga.o
+	ld --oformat binary -N -e start -Ttext 0x7c00 -o mbr-cga mbr-cga.o
+
+runcga: mbr-cga
+	qemu-system-i386 -boot a -fda mbr-cga
