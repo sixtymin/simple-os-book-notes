@@ -1,0 +1,80 @@
+
+1.变量声明
+
+EMPTY :=  
+SPACE := $(EMPTY) $(EMPTY)
+SLASH := /
+
+V     := @ 
+
+其中V定义为 @ 字符，放到命令前，意思是执行Makefile时不要输出当前行命令
+
+2. 默认后缀规则
+
+.SUFFIXES: .c .S .h
+
+.DELETE_ON_ERROR //如果命令执行失败，则删除目标文件
+
+3. 编译器以及标记定义
+
+HOSTCC      := gcc
+HOSTCFLAGS  := -g -Wall -O2
+
+GDB     := $(GCCPREFIX)gdb
+
+CC      := $(GCCPREFIX)gcc
+CFLAGS  := -fno-builtin -Wall -ggdb -m32 -nostdinc
+        
+    -fno-builtin    // 防止编译内联，函数可能会因为内联而被优化掉，这个开关关闭内联
+    -Wall           // 开启所有的警告信息
+    -ggdb           // 开启调试信息编译，编译结果可调试
+    -m32            // 编译为32位目标文件
+    -nostdinc       // 不要从标准系统目录搜索头文件，只从-I指定目录搜索
+
+CFLAGS  += $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
+    -fno-stack-protector    // 不使用栈保护器，其实就是函数调用后栈校验
+    编译器会为栈校验分配额外的空间用于添加验证码，用于防止程序中的栈溢出
+    
+    这一句的意思是，判断是否gcc默认开启了栈保护器，如果开启了则在编译标识中去掉它
+
+CTYPE   := c S
+
+LD      := $(GCCPREFIX)ld
+LDFLAGS := -m $(shell $(LD) -V | grep elf_i386 2>/dev/null)
+    -m      // -m emulation 模仿emulation链接器，可以用-V列出有效的模拟项
+    后面的$(shell 就是在找特定的模拟项
+
+OBJCOPY := $(GCCPREFIX)objcopy
+OBJDUMP := $(GCCPREFIX)objdump
+    objcopy // 将一种目标文件中内容复制到另一种类型的目标文件中
+    objdump // 用于查看目标文件或可执行文件的，例如反汇编代码section等
+
+
+3. Shell命令定义
+
+COPY    := cp
+MKDIR   := mkdir -p
+MV      := mv
+RM      := rm
+
+    直接将Linux的命令定义为特定变量
+
+4. 全局变量定义
+
+OBJDIR  := obj
+BINDIR  := bin
+
+    obj     // 用于存放中间文件
+    bin     // 用于存放最终文件
+
+ALLOBJS := 
+ALLDEPS := 
+TARGETS := 
+
+5. 包含其他的Makefile
+
+
+///////////////////////////////////
+1. Shell编程有待加强，Linux中到处再用Shell编程
+
+2. 
