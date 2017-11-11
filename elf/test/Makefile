@@ -4,11 +4,12 @@ all: main_s main_d
 main_s: main.o part.o
 	gcc main.o part.o -o main_s
 
-main_d: main.o libpart.o
+main_d: main.o libpart.so
 	gcc main.o -L. -lpart -o main_d
 
 libpart.so: part.o
 	gcc --shared part.o -o libpart.so
+
 main.o: main.c
 	gcc -c main.c -o main.o
 

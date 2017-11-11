@@ -12,7 +12,7 @@ int main(void){
 	func_2(str);
 
 	g_int1 = 9;
-	g_int2 = "defg";
+	g_str1 = "defg";
 
 	printf("Global integer is %d and %d, global string is %s and %s.\n", g_int1,
 		g_int2, g_str1, g_str2);
