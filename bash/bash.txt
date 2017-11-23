@@ -5,7 +5,7 @@
 
     ">": 重定向用来作用输入输出，尤其标准输入输出，即0，1，2三个文件。
 
-        $ kill -l 1234 >/dev/null 2>&1  // 将kill命令结果标准输出到 null设备，即不显示在标准输出设备（屏幕）上， >& 符号表示标准错误设备同标准输出设备。
+        $ kill -l 1234 >/dev/null 2>&1  // 将kill命令结果标准输出到 null设备，即不显示在标准输出设备（屏幕）上， 2>&1 符号表示标准错误设备等价于 标准输出设备。
 
     ">>": 附加到文件末尾
 
@@ -46,15 +46,161 @@
 
     2. exit命令为脚本执行返回状态，它不是必须的，但是如果脚本需要被其他的脚本调用，则需要该命令，以便其他脚本可以知道调用结果
         "exit 0" 表示成功执行
-    3.
+    3.shell脚本要想执行，则要使用chmod +x shell 将脚本添加可执行属性
+        使用$PATH=$PATH:. 将当前路径添加到可执行路径，然后直接 shell则可以执行
+        
+        最好使用 ./shell 的方式来执行脚本
+
+        对于常用的脚本可以放到 /usr/local/bin目录下，修改其属性，以方便调用
+4. 基本语法
+    1. 变量：
+        变量名区分大小写，变量定义或赋值时 '='两边不能有空格。
+        
+        对于值为字符串，则需要使用引号
+        
+        单引号中变量不会被扩展，但是双引号中变量引用会被扩展。
+        myvar="Hi there"
+        echo "$myvar"   => Hi there
+        echo '$myvar'   => $myvar
+        
+        read myvar      // 输入内容赋值给 myvar
+    
+        环境变量：
+            $PATH   家目录         $PATH    以冒号分割的搜索命令的目录列表
+            $PS1    命令行提示符$  $PS2     二级命令行提示符 > 
+            $IPS    输入域分隔符   $0       脚本名称
+            $#      脚本参数数量   $$       脚本进程PID /tmp/tmpfile_$$ 用于生成带有进程ID文件名
+            
+            $1      脚本第一个参数 $2       脚本第二个参数
+            $*      所有参数，以$IPS分割            
+    2. 条件
+        test 或 []：test 前后要有空格， [ ] 前后也要有空格，对于字符串变量的判断，最好添加双引号
+        
+        if condition1
+        then 
+            statements1
+        elif condition2
+            statements2
+        else 
+            statements2
+        fi
+        
+        字符串比较：
+            string1 = string2   如果两个字符串相同，则结果为真
+            string1 != string2  如果两个字符串不同，则结果为真
+            -n string           字符串不为空，则结果为真
+            -z string           字符串为null，则结果为真
+        
+        算数比较：
+            expr1 -eq expr2     两个表达式相等则结果为真
+            -ne 不等 -gt 大于 -ge 大于等于 -lt 小于  -le 小于等于  ! 取反
+            
+        文件条件测试
+            -d 是否目录 -e 是否存在 -f 是否普通文件 -g set-group-id位置位
+            -r 是否可读 -s 大小不为0 -u set-user-id位置位 
+            -w 是否可写 -x 是否可执行
+        
+    3. for循环
+        for foo in $(ls f*.sh); do
+            echo $foo 
+        done 
+        或
+        for foo in $(ls f*.sh)
+        do
+            echo $foo 
+        done         
+    
+    4. while循环
+        
+        while condition; do 
+            statements
+        done
+        或
+        while condition; 
+        do 
+            statements
+        done        
+        
+    5. case
+        case var in
+            part1 [| part2] ...) statements1;;
+            part3 [| part4] ...) statements2;;
+            ...
+        esac
+    6. AND列表 / OR列表
+    
+        && ||
+        
+    7. 函数
+        function_name(){
+            statements
+        }
+
+5. 命令
+    break       // 中断循环
+    :           // 空语句
+    continue    // 继续循环
+    .           // 在当前shell环境执行
+    echo        // 输出信息 -e 对转义执行 -n 不换行
+    eval        // 对参数进行求值
+    exec        // 将shell替换为一个不同的程序，或修改当前文件描述符 exec 3< afile
+    exit n      // 以退出码n结束脚本执行
+    export      // 将变量导出
+    expr        // 将参数作为表达式求值，同 $() 
+    printf      // C格式的字符串输出
+    return      // 函数返回，如果不指定返回值，则将最后一条语句返回值作为函数返回值
+    set         // 为shell设置参数变量
+    shift       // 参数变量左移一个位置
+    trap        // 设置接到指定信号后采取的行动  trap command signal 
+    unset       // 取消变量定义
+    
+6. grep和find
+    
+    find [path] [options] [tests] [actions]
+    [path] 指定搜索路径
+    [options]:
+        -depth      查看目录本身之前先搜索目录内容
+        -follow     跟随符号链接
+        -maxdepth N 最多搜索N曾目录
+        -mount      不搜索其他挂在系统目录
+        
+    [tests]:
+        -atime N        // N天之前最后访问
+        -mtime N        // N天之前最后修改
+        -name pattern   // 名字匹配pattern
+        -newer file     // 比file文件要新
+        -type c         // 文件类型为C
+        -user name      // 文件属于 name 用户
+        
+    [actions]:
+        -exec command   // 执行一条命令，必须以 \; 结尾
+        -ok command     // 执行一条命令，必须以 \; 结尾，提示用户进行确认
+        -print          // 打印文件名
+        -ls             // 执行 ls -dils 命令
+        
+    grep [options] PATTERN [FILES]
+        如果不提供文件名，则搜索标准输入
+        
+    [options]:
+        -c      // 输出匹配行数
+        -E      // 启用扩展表达式
+        -h      // 取消每行的普通前缀
+        -i      // 忽略大小写
+        -l      // 只包含匹配行的文件名，而不输出匹配行
+        -v      // 对匹配模式取反
+        
 正则表达式：
 
-    "*": 
-    "?": 
-    "[abc]"
-    "[^abc]":
+    "*":            零次或多次
+    "?":            任意字符一次
+    "[abc]"         任选其一
+    "[^abc]":       以其中一个字符开头
     "{abc, elf}": 
+    {n}             必须匹配n次
+    {n,}            匹配n次或n次以上
+    {n,m}           匹配n到m次之间，包括n和m
 
-grep: 
-
-find: 
+    ^       指向一行开头
+    $       指向一行结尾
+    .       任意单个字符
+    []      其中任一字符都可匹配
