@@ -48,7 +48,6 @@ set_menu_choice() {
 
     echo -e "Please enter choice then press return \c"
     read menu_choice
-	echo input char: $menu_choice
     return
 }
 
@@ -79,7 +78,7 @@ add_record_tracks(){
         fi
 
         if [ -n "$cdtitle" ] ; then
-            if [ -n "$cdtitle" != "q" ]; then
+            if [ "$cdtitle" != "q" ]; then
                 insert_track $cdcatnum, $cdtrack, $cdtitle
             fi
         else
@@ -89,7 +88,7 @@ add_record_tracks(){
     done
 }
 
-add_record() {
+add_records() {
     # Promt for the initial information
 
     echo -e "Enter catalog name \c"
@@ -292,7 +291,6 @@ quit=n
 while [ "$quit" != "y" ]
 do
     set_menu_choice 
-	echo "input $menu_choice, next case"
     case "$menu_choice" in
         a ) add_records;;
         r ) remove_records;;
