@@ -47,7 +47,8 @@ set_menu_choice() {
     echo
 
     echo -e "Please enter choice then press return \c"
-    read menu_chioce
+    read menu_choice
+	echo input char: $menu_choice
     return
 }
 
@@ -134,7 +135,7 @@ find_cd() {
     cdcatnum=""
     echo -e "Enter a string to search for in the CD titles \c"
     read searchstr
-    if [ "$searchstr" = " " ] ; then
+    if [ "$searchstr" = "" ] ; then
         return 0
     fi
 
@@ -290,21 +291,22 @@ quit=n
 
 while [ "$quit" != "y" ]
 do
-    set_menu_choice
-    case "$menu_choise" in
-        a) add_records;;
-        r) remove_records;;
-        f) find_cd y;;
-        u) update_cd;;
-        c) count_cds;;
-        l) list_tracks;;
-        b)
+    set_menu_choice 
+	echo "input $menu_choice, next case"
+    case "$menu_choice" in
+        a ) add_records;;
+        r ) remove_records;;
+        f ) find_cd y;;
+        u ) update_cd;;
+        c ) count_cds;;
+        l ) list_tracks;;
+        b )
             echo
             more $title_file
             echo
             get_return;;
         q | Q ) quit=y;;
-        *) echo "Sorry, choice not recognized";;        
+        * ) echo "Sorry, choice not recognized";;        
     esac
 done
 
