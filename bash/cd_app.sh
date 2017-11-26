@@ -38,7 +38,7 @@ set_menu_choice() {
     echo "  a) Add new CD"
     echo "  f) Find CD"
     echo "  c) Count the CDs and tracks in the catalog."
-    if [ "$cdcatnum" != " " ]; then
+    if [ "$cdcatnum" != "" ]; then
         echo "  l) List tracks on $cdtitle"
         echo "  r) Remove $cdtitle"
         echo "  u) Update track information for $cdtitle"
@@ -186,3 +186,129 @@ find_cd() {
 
     return 1
 }
+
+
+update_cd() {
+    if [ -z "$cdcatnum" ] ; then
+        echo "You must select a CD first"
+        find_cd n
+    fi
+
+    if [ -n "$cdcatnum" ] ; then
+        echo "Current tracks are: -"
+        list_tracks
+        echo
+        echo "This will re-enter the tracks for $cdtitle"
+        get_confirm && {
+            grep -v "^${cdcatnum}," $tracks_file > $temp_file
+            mv $temp_file $tracks_file
+            echo
+            add_record_tracks
+        }
+    fi
+
+    return
+}
+
+count_cds() {
+    set $(wc -l $title_file)
+    num_title=$1
+    set $(wc -l $tracks_file)
+    num_tracks=$1
+    echo found $num_titles CDs, with a total of $num_tracks tracks
+    get_return
+
+    return
+}
+
+remove_records() {
+    if [ -z "$cdcatnum" ] ; then
+        echo You must select a CD first
+        find_cd n        
+    fi
+
+    if [ -n "$cdcatnum" ] ; then
+        echo "Your are about to delete $cdtitle"
+        get_confirm && {
+            grep -v "^${cdcatnum}," $title_file > $temp_file
+            mv $temp_file $title_file
+            grep -v "^${cdcatnum}," $tracks_file > $temp_file
+            mv $temp_file $tracks_file
+            cdcatnum=""
+            echo Entry removed            
+        }
+
+        get_return
+    fi
+
+    return
+}
+
+list_tracks(){
+    if [ "$cdcatnum" = "" ] ; then
+        echo no CD selected yet
+        return 
+    else
+        grep "^${cdcatnum}," $tracks_file > $temp_file
+        num_tracks=$(wc -l $temp_file)
+        if [ "num_tracks" = "0" ] ; then
+            echo no tracks found for $cdtitle
+        else {
+            echo 
+            echo "$cdtitle :-"
+            echo
+            cut -f 2- -d , "$temp_file"
+            echo            
+            } | ${PAGER:-more}
+            
+        fi
+    fi
+
+    get_return
+    return
+}
+
+
+rm -f $temp_file
+if [ ! -f $title_file ] ; then
+    touch $title_file
+fi
+
+if [ ! -f $tracks_file ] ; then
+    touch $tracks_file
+fi
+
+#Now the application proper
+
+clear
+echo 
+echo
+echo "Mini CD manager"
+sleep 1
+
+quit=n
+
+while [ "$quit" != "y" ]
+do
+    set_menu_choice
+    case "$menu_choise" in
+        a) add_records;;
+        r) remove_records;;
+        f) find_cd y;;
+        u) update_cd;;
+        c) count_cds;;
+        l) list_tracks;;
+        b)
+            echo
+            more $title_file
+            echo
+            get_return;;
+        q | Q ) quit=y;;
+        *) echo "Sorry, choice not recognized";;        
+    esac
+done
+
+## Tidy up and leave
+rm -f $temp_file
+echo "Finished"
+exit 0
