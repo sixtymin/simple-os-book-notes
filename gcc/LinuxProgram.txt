@@ -19,7 +19,9 @@ GCC编译选项：
 	-o	指定编译要生成的目标文件名
 	-l	制定要链接的静态库或动态库
 	-L	添加链接库的搜索路径
-
+    
+    -g  编译调试版文件
+    
 3. 静态库也称为归档文件 archive，以 .a 结尾。
 	首先gcc -c 编译文件，然后使用 ar 工具对文件进行归档
 
@@ -34,3 +36,24 @@ GCC编译选项：
 
 	ldd 程序可以查看一个程序需要的共享库
 	
+5. 文件/目录操作
+    
+    open / read / write / lseek / ioctl / close 系统调用
+        
+        fstat / stat / lstat / dup / dup2 获取文件状态信息
+        
+    fopen / fread / fwrite / fseek / fflush / fclose 等库函数 （fileno将库函数使用文件句柄和系统调用文件句柄转换）
+    
+    fgetc / getc / getchar
+    fputc / putc / putchar 等库函数
+    
+    printf / fprintf / sprintf  等字符串格式化函数
+    scanf / fscanf / sscanf 
+    
+    chmod / chown / unlink / link / symlink / mkdir / rmdir / chdir / getcwd 等目录操作系统调用
+    
+    opendir / readdir / telldir / seekdir / closedir 等目录遍历系统调用
+    
+    strerror / perror 将错误码转换为字符串
+    
+    程序参数处理 / 环境变量 / 时间与日期 / 用户信息 / 主机信息 / 资源限制
