@@ -1,0 +1,50 @@
+
+EMPTY := 
+SPACE := $(EMPTY) $(EMPTY)
+SLASH := /
+
+V     := @
+
+# eliminate default suffix rules 消除默认的后缀规则
+.SUFFIXES: .c .S .h
+
+# delete target files if there is an error 如果遇到错误就将目标文件删除
+.DELETE_ON_ERROR
+
+# define compiler and flags
+
+GCCPREFIX := 
+
+HOSTCC := gcc 
+HOSTCFLAGS := -g -Wall -O2
+
+GDB    := $(GCCPREFIX)gdb
+
+CC     := $(GCCPREFIX)gcc
+CFLAGS := -fno-builtin -Wall -ggdb -m32 -nostdinc
+# test -fno-stack-protector option can be use
+CFLAGS += $(shell $(CC) -fno-stack-protector -E -x c /dev/null > /dev/null 2>&1 && echo -fno-stack-protector)
+CTYPE  := c S
+
+LD     := $(GCCPREFIX)ld
+# simulate specific formats
+LDFLAGS := -m $(shell $(LD) -V | grep elf_i386 2>/dev/null)
+
+OBJCOPY := $(GCCPREFIX)objcopy
+OBJDUMP := $(GCCPREFIX)objdump
+
+COPY    := cp
+MKDIR   := mkdir -p 
+MV      := mv 
+RM      := rm -f 
+
+OBJDIR  := obj
+BINDIR  := bin 
+
+ALLOBJS := 
+ALLDEPS := 
+TARGETS := 
+
+
+
+
